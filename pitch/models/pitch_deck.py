@@ -1,3 +1,4 @@
+from sqlalchemy.dialects.postgresql import UUID
 from pitch import db
 from pitch.models.base import BaseModel
 from datetime import datetime
@@ -6,8 +7,7 @@ class PitchDeck(BaseModel):
     """Pitch deck model"""
     __tablename__ = 'pitch_decks'
     
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
     original_filename = db.Column(db.String(256), nullable=False)
     stored_filename = db.Column(db.String(256), nullable=False)
     file_size = db.Column(db.Integer, nullable=False)

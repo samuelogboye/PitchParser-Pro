@@ -12,12 +12,12 @@ def upload_file():
         return jsonify({"error": "No file part"}), 400
     return ParserService.upload_file(request.files['file'])
 
-@parser_bp.route('/pitch-decks/<int:pitch_deck_id>', methods=['GET'])
+@parser_bp.route('/pitch-decks/<uuid:pitch_deck_id>', methods=['GET'])
 @jwt_required()
 def get_pitch_deck(pitch_deck_id):
     return ParserService.get_pitch_deck(pitch_deck_id)
 
-@parser_bp.route('/pitch-decks/<int:pitch_deck_id>/slides', methods=['GET'])
+@parser_bp.route('/pitch-decks/<uuid:pitch_deck_id>/slides', methods=['GET'])
 @jwt_required()
 def get_slides(pitch_deck_id):
     return ParserService.get_slides(pitch_deck_id)

@@ -1,7 +1,6 @@
-from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
 from pitch.models.base import BaseModel
 from time import time
 
@@ -13,7 +12,7 @@ class User(BaseModel):
 
     updated_at = None
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(512))
     refresh_tokens = db.relationship('RefreshToken', backref='user', lazy=True)
     
     # Relationship to pitch decks
@@ -40,8 +39,8 @@ class RefreshToken(BaseModel):
     '''Refresh Token Table'''
     __tablename__ = 'refreshtokens'
 
-    token = db.Column(db.String(256), unique=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(512), unique=True, nullable=False)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
     used = db.Column(db.Boolean, default=False, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
 

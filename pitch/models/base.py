@@ -10,8 +10,7 @@ from datetime import datetime
 
 def get_uuid():
     """Generate a unique id using uuid4()"""
-    return uuid4().hex
-
+    return str(uuid4())
 
 # Create a base model class that will contain common functionality
 class BaseModel(db.Model):
@@ -21,7 +20,7 @@ class BaseModel(db.Model):
     __abstract__ = True
 
     # Define a primary key column with a default value of a generated UUID
-    id = db.Column(db.String(60), primary_key=True, default=get_uuid(), unique=True, nullable=False)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=get_uuid(), unique=True, nullable=False)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp(), nullable=False)
     updated_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
