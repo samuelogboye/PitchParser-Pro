@@ -1,5 +1,5 @@
 import os
-from .celery import celery
+from pitch.celery.celery import celery 
 from pitch.models.pitch_deck import PitchDeck
 from pitch.models.pitch_deck_slide import PitchDeckSlide
 from pitch.utils.pdf_parser import parse_pdf

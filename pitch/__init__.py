@@ -99,11 +99,6 @@ def create_app():
 
     app = Flask(__name__)
 
-    # from pitch.celery.celery import init_celery
-    # celery = init_celery(app)
-    from pitch.celery.celery import make_celery
-    celery = make_celery(app)
-
     # Load Configuration
     config_map = {
         'development': DevelopmentConfig,
@@ -113,6 +108,9 @@ def create_app():
 
     env = os.getenv('FLASK_ENV', 'development')
     app.config.from_object(config_map.get(env, Config))
+
+    from pitch.celery.celery import make_celery
+    celery = make_celery(app)
 
     if app.config["SQLALCHEMY_DATABASE_URI"]:
         print("using db")
@@ -168,6 +166,7 @@ def create_app():
             "createapp.update_swagger_host()", f"Swagger host updated- {swagger_template['host']}")
         
     # Import models before creating tables
+    from pitch.models.user import User, RefreshToken
     from pitch.models.pitch_deck import PitchDeck
     from pitch.models.pitch_deck_slide import PitchDeckSlide
 

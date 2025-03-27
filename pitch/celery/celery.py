@@ -51,9 +51,22 @@ from __future__ import absolute_import
 from celery import Celery
 import os
 
+celery = Celery(__name__)
+
 def make_celery(app):
-    celery = Celery(
-        app.import_name,
+    required_configs = ['CELERY_RESULT_BACKEND', 'CELERY_BROKER_URL']
+    for config in required_configs:
+        if config not in app.config:
+            raise ValueError(f"Missing required Celery configuration: {config}")
+        
+    # celery = Celery(
+    #     app.import_name,
+    #     backend=app.config['CELERY_RESULT_BACKEND'],
+    #     broker=app.config['CELERY_BROKER_URL']
+    # )
+    # celery.conf.update(app.config)
+    # Configure the existing instance
+    celery.conf.update(
         backend=app.config['CELERY_RESULT_BACKEND'],
         broker=app.config['CELERY_BROKER_URL']
     )
@@ -66,5 +79,3 @@ def make_celery(app):
 
     celery.Task = ContextTask
     return celery
-
-celery = None  # This will be initialized in create_app
