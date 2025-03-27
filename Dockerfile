@@ -1,32 +1,34 @@
 # Use official Python image
 FROM python:3.9-slim
 
-# Set working directory
-WORKDIR /app
-
-# Create logs directory with proper permissions
-RUN mkdir -p /app/logs && chmod 777 /app/logs
-
 # Install system dependencies (required for PyPDF2, pptx, etc.)
 RUN apt-get update && apt-get install -y \
     gcc \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r celeryuser && useradd -r -g celeryuser celeryuser && chown -R celeryuser:celeryuser /app
+# Create user and group first
+RUN groupadd -g 1001 celeryuser && \
+    useradd -u 1001 -g celeryuser celeryuser && \
+    mkdir -p /app/logs && \
+    chown -R celeryuser:celeryuser /app
+
+# Set working directory
+WORKDIR /app
+
+# Create logs directory with proper ownership
+RUN mkdir -p /app/logs && \
+    chown celeryuser:celeryuser /app/logs && \
+    chmod 755 /app/logs
 
 # Copy requirements and install Python packages
-COPY requirements.txt .
+COPY --chown=celeryuser:celeryuser requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy application code with proper ownership
+COPY --chown=celeryuser:celeryuser . .
 
 USER celeryuser
-
-# Environment variables (override in docker-compose.yml if needed)
-ENV FLASK_APP=app/__init__.py
-ENV FLASK_ENV=production
 
 # Expose port (matches Flask's default)
 EXPOSE 5000
