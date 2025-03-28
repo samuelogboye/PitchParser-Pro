@@ -1,4 +1,3 @@
-# PitchParser Pro - Document Parsing API
 
 # PitchParser Pro
 
@@ -28,7 +27,7 @@ This project is a web application designed to parse and process uploaded pitch d
 ### Frontend
 - **Framework**: React (TypeScript)
 - **Styling**: Tailwind CSS
-- **State Management**: React Context or Redux (optional)
+- **State Management**: React Context 
 
 ## Prerequisites
 - Docker and Docker Compose installed on your machine.
@@ -40,47 +39,134 @@ This project is a web application designed to parse and process uploaded pitch d
 ```bash
 git clone <repository-url>
 cd <repository-folder>
+```
 
-## Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/pitchparser-pro.git
-   cd pitchparser-pro
-   ```
+### 2. Backend Setup
 
-2.  Run with Docker:
+#### Environment Variables
+
+Create a  `.env`  file in the  `backend`  directory with the following variables:
+
+```env
+FLASK_APP=app.py
+FLASK_ENV=development
+DATABASE_URL=postgresql://postgres:postgres@db:5432/pitch_deck_db
+REDIS_URL=redis://redis:6379/0
+CELERY_BROKER_URL=amqp://rabbitmq:5672
+SECRET_KEY=your-secret-key
+```
+You can also create from .env.example file
+
+#### Run with Docker
+
+From the project root, run:
+
+```bash
+docker-compose up --build
+```
+
+This will start the following services:
+
+-   Flask backend (`api`)
     
-    ```bash
-    docker compose up --build
-    ```
+-   PostgreSQL database (`db`)
+    
+-   Redis (`redis`)
+    
+-   RabbitMQ (`rabbitmq`)
+    
+-   Celery worker (`celery`)
+    
 
-## API Endpoints
+### 3. Frontend Setup
 
+Navigate to the  `frontend`  directory here https://github.com/samuelogboye/PitchParser-Frontend:
 
-| Method | Endpoint  | Description                      |
-|--------|----------|----------------------------------|
-| POST   | /upload  | Upload a PDF/PPTX file for parsing |
+```bash
+cd frontend
+
+#### Install Dependencies
+
+```bash
+npm install
+```
+#### Run the Frontend
+
+```bash
+npm run dev
+```
+The frontend will be available at  `http://localhost:5173`.
+
+## API Routes
+
+### Authentication
+
+-   **POST /api/v1/auth/register**: Register a new user.
+    
+    -   Request Body:
+        
+        ```json
+        {
+          "email": "string",
+          "password": "string"
+        }
+        ```
+        
+-   **POST /api/v1/auth/login**: Log in an existing user.
+    
+    -   Request Body:
+        
+        ```json
+        {
+          "email": "string",
+          "password": "string"
+        }
+        ```
+        
+
+### Document Upload and Parsing
+
+-   **POST /api/v1/parser/upload**: Upload a pitch deck file (PDF or PPTX).
+    
+    -   Headers:  `Authorization: Bearer <token>`
+        
+    -   Form Data:  `file`  (the document to upload).
+        
+-   **GET  /api/v1/parser/pitch-decks**: Retrieve all parsed documents for the logged-in user.
+    
+    -   Headers:  `Authorization: Bearer <token>`
+        
 
 ## Testing
 
+### Backend Tests
+
+To run unit tests for the backend:
+
 ```bash
-curl -X POST -F "file=@pitch_deck.pdf" http://localhost:5000/upload
+docker-compose run api python -m pytest
 ```
-## Tech Stack
 
--   **Backend**: Flask, Celery (async processing)
+
+
+## Additional Notes
+
+-   The Celery worker processes file uploads asynchronously.
     
--   **Database**: PostgreSQL
+-   Redis caches frequently accessed data to improve performance.
     
--   **Cache**: Redis
+-   PostgreSQL is used for persistent data storage.
     
--   **Queue**: RabbitMQ
-    
--   **Parsing**: PyPDF2, python-pptx
+-   Ensure all services are running (`api`,  `db`,  `redis`,  `rabbitmq`,  `celery`) before testing.
     
 
-## **Why This Solution Stands Out**
-✅ **Scalable Architecture** (Docker, Celery, Redis)  
-✅ **Robust Error Handling** (File validation, async retries)  
-✅ **Extensible Parsing** (Easy to add new document types)  
-✅ **Clear Documentation** (README, API specs, Swagger Doc)
+## Troubleshooting
+
+-   **Docker Issues**: Ensure Docker is running and ports are not occupied.
+    
+-   **Database Errors**: Verify the PostgreSQL service is up and the  `.env`  file is correctly configured.
+    
+
+## Contact
+
+For questions or issues, please contact:  [Samuel Ogboye](https://mailto:ogboyesam@gmail.com/).
