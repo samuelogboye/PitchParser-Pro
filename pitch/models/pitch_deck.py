@@ -20,7 +20,8 @@ class PitchDeck(BaseModel):
 
     def to_dict(self):
         return {
-            'id': self.id,
+            'id': str(self.id),  # Convert UUID to string
+            'user_id': str(self.user_id),  # Convert UUID to string
             'original_filename': self.original_filename,
             'upload_date': self.upload_date.isoformat(),
             'processing_status': self.processing_status,
