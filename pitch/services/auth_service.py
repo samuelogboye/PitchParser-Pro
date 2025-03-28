@@ -5,6 +5,7 @@ from pitch import db
 from pitch.utils.validation import validate_email, validate_password
 from pitch.utils.logger import log_success
 from pitch.models.user import User, RefreshToken
+from uuid import UUID
 
 PASSWORD_VALIDATION_ERROR = 'Password must be at least 8 char, at least one letter and one number'
 
@@ -41,6 +42,10 @@ class AuthService:
 
         access_token = AuthService._create_access_token(user.id)
         refresh_token = AuthService._create_refresh_token(user.id)
+
+        # Remove old refresh token before storing the new one
+        RefreshToken.query.filter_by(user_id=user.id).delete()
+        db.session.commit()
 
         # Store the new refresh token in the database
         AuthService._store_refresh_token(refresh_token)
@@ -127,7 +132,7 @@ class AuthService:
         # Store the new refresh token in the database
         new_token = RefreshToken(
             token=refresh_token,
-            user_id=user_id,
+             user_id=UUID(user_id) if isinstance(user_id, str) else user_id,
             used=False,
             expires_at=expires_at
             )
@@ -140,6 +145,9 @@ class AuthService:
     def delete_expired_refresh_tokens(user_id):
         '''Deletes expired refresh tokens of a user'''
         now = datetime.now(timezone.utc)
+        # Convert user_id if it's a string
+        if isinstance(user_id, str):
+            user_id = UUID(user_id)
         expired_tokens = RefreshToken.query.filter(
             RefreshToken.user_id == user_id,
             RefreshToken.expires_at < now
