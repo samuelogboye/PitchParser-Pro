@@ -86,7 +86,7 @@ from __future__ import absolute_import
 from celery import Celery
 import os
 
-CELERY_BROKER_URL="amqp://guest:guest@rabbitmq:5672//"
+CELERY_BROKER_URL='amqp://admin:mypass@rabbit//'
 CELERY_RESULT_BACKEND="redis://redis:6379/0" #"redis://localhost:6379/0"
 
 def make_celery(app=None):

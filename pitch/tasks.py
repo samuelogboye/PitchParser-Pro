@@ -33,7 +33,7 @@ def get_task(task_id):
     return AsyncResult(task_id, app=celery)
 
 @celery.task()
-def process_pitchdeck(filepath: str, filename: str, user_id: UUID):
+def process_pitchdeck(filepath: str, filename: str, user_id):
     """Process pitch deck file and store in database"""
     log_success("process_pitchdeck", f'Processing pitch deck: {filename}')
     
