@@ -109,8 +109,9 @@ def create_app():
     env = os.getenv('FLASK_ENV', 'development')
     app.config.from_object(config_map.get(env, Config))
 
-    from pitch.celery.celery import make_celery
-    celery = make_celery(app)
+    # from pitch.celery.celery import make_celery
+    # celery = make_celery(app)
+    # app.celery = celery
 
     if app.config["SQLALCHEMY_DATABASE_URI"]:
         print("using db")
@@ -125,7 +126,7 @@ def create_app():
     cache.init_app(app)
 
     # Redis (Caching)
-    redis_client = FlaskRedis(app)
+    # redis_client = FlaskRedis(app)
 
     
     # Initialize SQLAlchemy
