@@ -9,6 +9,14 @@ parser_bp = Blueprint("parser", __name__)
 @parser_bp.route('/upload', methods=['POST'])
 @jwt_required()
 def upload_file():
+    '''Uploads a pitch deck file (PDF or PPTX) and initiates processing
+    
+    Requires a valid JWT token, which is used to determine the user ID
+    associated with the upload.
+    
+    Returns a JSON response with a task ID, which can be used to poll
+    for progress.
+    '''
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
 

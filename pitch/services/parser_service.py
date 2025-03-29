@@ -44,11 +44,11 @@ class ParserService:
            
             file.save(filepath)
            
-            task = process_pitchdeck(filepath, filename, user_id)
-            log_success('upload_file', f'File uploaded successfully, task created: {task["pitch_deck_id"]}')
+            task = process_pitchdeck.delay(filepath, filename, user_id)
+            log_success('upload_file', f'File uploaded successfully, task created: {task.id}')
             return {
                 'message': 'File uploaded successfully',
-                'task_id': task['pitch_deck_id']
+                'task_id': task.id
             }, 202
         except Exception as e:
             log_error('upload_file', str(e))
