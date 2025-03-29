@@ -12,22 +12,6 @@ services:
     links:
       - rabbitmq
       - redis
-    # env_file: .env
-    # ports:
-    #   - "5000:5000"
-    # volumes:
-    #   - .:/app
-    # depends_on:
-    #   - db
-    #   - redis
-    #   - rabbitmq
-    # environment:
-    #   - FLASK_ENV=${FLASK_ENV}
-    #   - DATABASE_URL=${DATABASE_URL}
-    #   - REDIS_URL=${REDIS_URL}
-    #   - CELERY_BROKER_URL=${CELERY_BROKER_URL}
-    #   - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
-    # restart: on-failure
 
   db:
     image: postgres:13-alpine
@@ -46,47 +30,29 @@ services:
   redis:
     image: redis:latest
     hostname: redis
-    # image: redis:6-alpine
-    # ports:
-    #   - "6379:6379"
-    # volumes:
-    # - redis_data:/data
-    # healthcheck:
-    #   test: ["CMD", "redis-cli", "ping"]
-    #   interval: 5s
-    #   timeout: 5s
-    #   retries: 5
-    # command: redis-server --requirepass yourpassword --appendonly yes
-    # restart: unless-stopped
 
   rabbitmq:
     hostname: rabbitmq
-    image: rabbitmq:latest
+    image: rabbitmq:3-management  # Use management version to access web UI
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=mypass
-    # image: rabbitmq:3-management
-    # ports:
-    #   - "5672:5672"
-    #   - "15672:15672"
-    # environment:
-    #   - RABBITMQ_ERLANG_COOKIE=mysecretcookie # Set a custom cookie
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "5672:5672"  # AMQP port
+      - "15672:15672"  # Management UI port
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_logs:/var/log/rabbitmq
-    # healthcheck:
-    #   test: ["CMD", "rabbitmqctl", "status"]
-    #   interval: 10s
-    #   timeout: 30s
-    #   retries: 5
-    #   start_period: 60s # Longer startup window
-    # restart: unless-stopped # Add automatic restart
 
   worker:
     build:
       context: .
       dockerfile: Dockerfile
     command: ./scripts/run_celery.sh
+    environment:
+      - CELERY_BROKER_URL=amqp://admin:mypass@rabbitmq//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     volumes:
       - .:/app
     links:
@@ -94,35 +60,6 @@ services:
       - redis
     depends_on:
       - rabbitmq
-  # celery:
-  #   build: .
-  #   # command: celery -A pitch.celery.celery worker --loglevel=info
-  #   command: >
-  #     bash -c "while ! celery -A pitch.celery.celery inspect ping; do
-  #       echo 'Waiting for Celery to start...';
-  #       sleep 2;
-  #     done &&
-  #     celery -A pitch.celery.celery worker --loglevel=info"
-  #   user: "1001:1001"
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #   environment:
-  #     - FLASK_ENV=development
-  #     - DATABASE_URL=postgresql://postgres:password@db/pitchparser
-  #     - REDIS_URL=redis://redis:6379/0
-  #     - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-  #     - CELERY_RESULT_BACKEND=redis://redis:6379/0
-  #     - C_FORCE_ROOT=0
-  #   volumes:
-  #     - ./logs:/app/logs
-  #     - .:/app
-  #   # restart: on-failure
-  #   restart: unless-stopped
 
 volumes:
   postgres_data:

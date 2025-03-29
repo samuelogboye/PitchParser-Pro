@@ -16,7 +16,7 @@ import os
 import time
 
 REDIS_URL = 'redis://redis:6379/0'
-BROKER_URL = 'amqp://admin:mypass@rabbit//'
+BROKER_URL = 'amqp://admin:mypass@rabbitmq//'
 
 celery = Celery('tasks',
                 backend=REDIS_URL,

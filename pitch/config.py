@@ -16,7 +16,7 @@ class Config:
     CACHE_TYPE = "SimpleCache"
 
     # Celery + RabbitMQ
-    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://admin:mypass@rabbit//')
+    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://admin:mypass@rabbitmq//')
     CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
 
     # Redis (for caching)
