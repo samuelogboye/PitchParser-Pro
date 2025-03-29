@@ -1,2 +1,2 @@
 #!/bin/sh
-celery -A pitch.tasks worker --loglevel INFO
+celery -A pitch.celery_worker.celery worker --loglevel INFO
